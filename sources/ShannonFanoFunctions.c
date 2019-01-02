@@ -1,3 +1,10 @@
+/*
+Shannon-Fano's Functions implementation
+****************************************************************************
+Author: Mohammad Halabi
+Programming language: C standard version 99
+****************************************************************************
+*/
 
 #include "../headers/ShannonFanoFunctions.h"
 #include "../headers/LZSFunctions.h"
@@ -265,7 +272,7 @@ void writeCompressedFile(unsigned char *buffer, int bufferSize, FILE *outputFile
 }
 
 
-void compress(char *compFileName, unsigned char *codedBuffer, int codedBufferCounter) {
+void compressSHF(char *toCompFileName, unsigned char *codedBuffer, int codedBufferCounter) {
     Element *elements = malloc(MAX_CODE * sizeof(Element));
     Code *codes = malloc(MAX_CODE * sizeof(Code));
     initializeElements(elements);
@@ -283,7 +290,7 @@ void compress(char *compFileName, unsigned char *codedBuffer, int codedBufferCou
     canonizeCodes(elements);
 
     orderByWord(elements);
-    FILE *compressed = fopen(compFileName, "wb");
+    FILE *compressed = fopen(toCompFileName, "wb");
     writeCompressedFile(codedBuffer, codedBufferCounter, compressed, elements);
     free(codedBuffer);
 }
@@ -368,8 +375,6 @@ char *byteToChars(unsigned char byte) {
 }
 
 
-//unsigned int decompBufferSize = 0;
-
 unsigned char *writeDecompBuffer(Node *root, unsigned char *bufferIn, int bufferSize) {
 
     Node *actualRoot = root;
@@ -410,7 +415,7 @@ unsigned char *writeDecompBuffer(Node *root, unsigned char *bufferIn, int buffer
 }
 
 
-unsigned char *decompress(char *compFileName) {
+unsigned char *decompressSHF(char *compFileName) {
 
     Element *elements = malloc(MAX_CODE * sizeof(Element));
     Node *root = createNode(NULL, NULL, -1, -1);

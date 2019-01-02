@@ -1,4 +1,12 @@
 
+/*
+Shannon-Fano's Functions header file.
+****************************************************************************
+Author: Mohammad Halabi
+Programming language: C standard version 99
+****************************************************************************
+*/
+
 #ifndef COMPRESSOR_COMPRESSION_H
 #define COMPRESSOR_COMPRESSION_H
 
@@ -71,12 +79,11 @@ void writeLengths(FILE *outputFile, Element *ptrElements);
 
 void writeCompressedFile(unsigned char *buffer, int bufferSize, FILE *outputFile, Element *ptrElements);
 
-void compress(char *toCompFileName, unsigned char *codedBuffer, int codedBufferCounter);
+void compressSHF(char *toCompFileName, unsigned char *codedBuffer, int codedBufferCounter);
 
 
 /********************** Decompression's Functions Declaration ******************************/
 
-//unsigned int getFileSize(FILE *inputFile);
 
 void readHeader(FILE *inputFile, Element *ptrElements);
 
@@ -92,7 +99,7 @@ char *byteToChars(unsigned char byte);
 
 unsigned char *writeDecompBuffer(Node *root, unsigned char *bufferIn, int bufferSize);
 
-unsigned char *decompress(char *compFileName);
+unsigned char *decompressSHF(char *compFileName);
 
 
 #endif //COMPRESSOR_COMPRESSION_H

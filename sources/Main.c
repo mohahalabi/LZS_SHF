@@ -1,3 +1,15 @@
+
+/*
+LZS - Shannon-Fano Compression algorithm.
+****************************************************************************
+Authors
+LZS: Eric Palamas
+Shannon-Fano: Mohammad Halabi
+
+Programming language: C standard version 99
+****************************************************************************
+*/
+
 #include "../headers/ShannonFanoFunctions.h"
 #include "../headers/LZSFunctions.h"
 
@@ -14,7 +26,7 @@ int main(int argc, char *argv[]) {
         printf("inizio compressione shannonFano...\n\n");
         int bufferSize = getCodedBufferSize();
         unsigned char *buffer = getCodedBuffer();
-        compress(argv[3], buffer, bufferSize);
+        compressSHF(argv[3], buffer, bufferSize);
         printf("fine compressione shannonFano\n\n");
         clock_t fine = clock();
         double tempo = (double) (fine - inizio) / CLOCKS_PER_SEC;
@@ -23,7 +35,7 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[1], "-d") == 0) {
         clock_t inizio = clock();
         printf("inizio decompressione shannonFano...\n\n");
-        unsigned char *buffer = decompress(argv[2]);
+        unsigned char *buffer = decompressSHF(argv[2]);
         printf("fine decompressione shannon\n\n");
 
         printf("inizio decompressione LZS...\n\n");

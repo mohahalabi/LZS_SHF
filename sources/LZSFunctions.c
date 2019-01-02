@@ -4,6 +4,7 @@
 #include "../headers/LZSFunctions.h"
 
 #define WINDOW_SIZE 2048
+#define MIN_SIZE_TO_COMPRESS 260
 /**
  * byte: E' l'appoggio che utilizzo per scrivere i singoli bit sul file, questo infatti viene riempito con otto bit e poi scritto.
  * currentBit: Variabile che indica quanti bit sono stati inseriti all'interno del byte.
@@ -32,15 +33,18 @@ int LZSCompression(int argc, char *nameInputFile) {
     if (checkFile(argc, nameInputFile) == 1) {
         return 1;
     }
+
     FILE *inputFile = fopen(nameInputFile, "rb");
     int fileSize = getFileSize(inputFile);
+
+    if (exceptionManegement(fileSize) == 1) {
+        return 1;
+    }
     unsigned char *buffer = (unsigned char *) malloc((fileSize) * sizeof(unsigned char));
     codedBuffer = (unsigned char *) malloc(sizeof(unsigned char));
     fread(buffer, (size_t) fileSize, 1, inputFile);
-    if (exceptionManegement(fileSize) == 1)
-        return 1;
+
     encoding(buffer, fileSize);
-    //free(buffer);
     fclose(inputFile);
     return 0;
 }
@@ -52,7 +56,7 @@ int LZSCompression(int argc, char *nameInputFile) {
  * @param fileSize: dimensione del file
  */
 int exceptionManegement(int fileSize) {
-    if (fileSize <= 4) {
+    if (fileSize <= MIN_SIZE_TO_COMPRESS) {
         printf("File passato troppo piccolo per essere compresso\n");
         return 1;
     } else {
@@ -196,7 +200,7 @@ void writeEndMarker() {
     while (currentBit != 0) {
         addBitToBuffer(0);
     }
-    printf("%d \n", codedBufferCounter);
+    //printf("%d \n", codedBufferCounter);
 }
 
 /**
