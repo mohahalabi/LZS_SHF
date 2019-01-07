@@ -30,9 +30,11 @@ int getCodedBufferSize() {
  * Funzione chiamata quando si passa il parametro "-c", fa partire la compressione del file gestendo eventuali eccezioni che potrebbero verificarsi.
  */
 int LZSCompression(int argc, char *nameInputFile) {
+/*
     if (checkFile(argc, nameInputFile) == 1) {
         return 1;
     }
+*/
 
     FILE *inputFile = fopen(nameInputFile, "rb");
     int fileSize = getFileSize(inputFile);
@@ -266,19 +268,19 @@ void writeOffset(int offset) {
     }
 }
 
-int checkFile(int argc, char *inputFile) {
+/*int checkFile(int argc, char *inputFile) {
     if (argc != 4) {
         printf("errore negli argomenti \n");
         return 1;
     }
     FILE *controllo = fopen(inputFile, "r");
     if (!controllo) {
-        fclose(controllo);
+        //fclose(controllo);
         printf("file passato inesistente \n");
         return 1;
     }
     return 0;
-}
+}*/
 
 /**
  * In base a quanto vale la lunghezza passata vengono scritti determinati bit (specificati nella tabella dello standard).

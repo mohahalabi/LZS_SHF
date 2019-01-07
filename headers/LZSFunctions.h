@@ -35,7 +35,7 @@ void writeByteToBuffer();
 
 void addBitToBuffer(unsigned char bit);
 
-int checkFile(int argc, char *inputFile);
+//int checkFile(int argc, char *inputFile);
 
 unsigned int getFileSize(FILE *inputFile);
 
