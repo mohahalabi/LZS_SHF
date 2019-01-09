@@ -43,45 +43,62 @@ int isInvalidFile(char *inputFile) {
 }
 
 
-void executionTime(clock_t start, clock_t end) {
+void executionTime(clock_t start, clock_t end, char *algorithm) {
     double tempo = (double) (end - start) / CLOCKS_PER_SEC;
-    printf("Il tempo di compressione e' pari a: %.3lf secondi\n", tempo);
+    printf("Tempo d'esecuzione di %s: %.3lf secondi\n", algorithm, tempo);
 }
 
 
 int main(int argc, char *argv[]) {
 
+    clock_t startSHF;
+    clock_t endSHF;
+
+    clock_t startLZS;
+    clock_t endLZS;
+
+
     if (isInvalidArgoments(argc) || isInvalidFile(argv[2])) {
         return 1;
     }
     if (strcmp(argv[1], "-c") == 0) {
+
         printf("Inizio compressione LZS...\n");
-        clock_t inizio = clock();
+        startLZS = clock();
         int error = LZSCompression(argc, argv[2]);
         if (error)
             return 1;
         printf("Fine compressione LZS\n\n");
 
-        printf("Inizio compressione shannonFano...\n");
+        endLZS = clock();
+
+        printf("Inizio compressione ShannonFano...\n");
+        startSHF = clock();
         int bufferSize = getCodedBufferSize();
         unsigned char *buffer = getCodedBuffer();
         compressSHF(argv[3], buffer, bufferSize);
+        endSHF = clock();
         printf("Fine compressione shannonFano\n\n");
 
-        clock_t fine = clock();
-        executionTime(inizio, fine);
+        executionTime(startLZS, endLZS, "LZS");
+        executionTime(startSHF, endSHF, "SannonFano");
+        executionTime(startLZS, endSHF, "LZS-SHF");
     } else if (strcmp(argv[1], "-d") == 0) {
-        clock_t inizio = clock();
-        printf("Inizio decompressione shannonFano...\n");
-        unsigned char *buffer = decompressSHF(argv[2]);
-        printf("Fine decompressione shannon\n\n");
 
+        printf("Inizio decompressione shannonFano...\n");
+        startSHF = clock();
+        unsigned char *buffer = decompressSHF(argv[2]);
+        endSHF = clock();
+        printf("Fine decompressione shannon\n\n");
         printf("Inizio decompressione LZS...\n");
+        startLZS = clock();
         LZSDecompression(argc, buffer, argv[3]);
+        endLZS = clock();
         printf("Fine decompressione LZS\n\n");
 
-        clock_t fine = clock();
-        executionTime(inizio, fine);
+        executionTime(startSHF, endSHF, "SannonFano");
+        executionTime(startLZS, endLZS, "LZS");
+        executionTime(startSHF, endLZS, "LZS-SHF");
     } else {
         argsErrorMessage();
         return 1;
