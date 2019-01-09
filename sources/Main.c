@@ -43,42 +43,47 @@ int isInvalidFile(char *inputFile) {
 }
 
 
+void executionTime(clock_t start, clock_t end) {
+    double tempo = (double) (end - start) / CLOCKS_PER_SEC;
+    printf("Il tempo di compressione e' pari a: %.3lf secondi\n", tempo);
+}
+
+
 int main(int argc, char *argv[]) {
 
     if (isInvalidArgoments(argc) || isInvalidFile(argv[2])) {
         return 1;
     }
     if (strcmp(argv[1], "-c") == 0) {
-        printf("inizio compressione LZS...\n\n");
+        printf("Inizio compressione LZS...\n");
         clock_t inizio = clock();
         int error = LZSCompression(argc, argv[2]);
         if (error)
             return 1;
-        printf("fine compressione LZS\n\n");
-        printf("inizio compressione shannonFano...\n\n");
+        printf("Fine compressione LZS\n\n");
+
+        printf("Inizio compressione shannonFano...\n");
         int bufferSize = getCodedBufferSize();
         unsigned char *buffer = getCodedBuffer();
         compressSHF(argv[3], buffer, bufferSize);
-        printf("fine compressione shannonFano\n\n");
-        clock_t fine = clock();
-        double tempo = (double) (fine - inizio) / CLOCKS_PER_SEC;
-        printf("Il tempo di compressione e' pari a: %lf secondi\n\n", tempo);
+        printf("Fine compressione shannonFano\n\n");
 
+        clock_t fine = clock();
+        executionTime(inizio, fine);
     } else if (strcmp(argv[1], "-d") == 0) {
         clock_t inizio = clock();
-        printf("inizio decompressione shannonFano...\n\n");
+        printf("Inizio decompressione shannonFano...\n");
         unsigned char *buffer = decompressSHF(argv[2]);
-        printf("fine decompressione shannon\n\n");
+        printf("Fine decompressione shannon\n\n");
 
-        printf("inizio decompressione LZS...\n\n");
+        printf("Inizio decompressione LZS...\n");
         LZSDecompression(argc, buffer, argv[3]);
-        printf("fine decompressione LZS\n\n");
+        printf("Fine decompressione LZS\n\n");
 
         clock_t fine = clock();
-        double tempo = (double) (fine - inizio) / CLOCKS_PER_SEC;
-        printf("Il tempo di decompressione e' pari a: %lf secondi\n\n", tempo);
+        executionTime(inizio, fine);
     } else {
-        printf("errore negli argomenti passati \n");
+        argsErrorMessage();
         return 1;
     }
     return 0;

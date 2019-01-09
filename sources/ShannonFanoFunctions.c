@@ -184,7 +184,7 @@ char *fromNumToChars(long long num, int length) {
     return code;
 }
 
-// funzionante per lunghezze di codifiche minori di 64 bits
+
 void canonizeCodes(Element *ptrElements) {
 
     CodeBits *codeBits = getCodeBits();
