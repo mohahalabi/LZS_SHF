@@ -23,7 +23,7 @@ void argsErrorMessage() {
 }
 
 
-int isInvalidArgoments(int argc) {
+int isInvalidArgs(int argc) {
     if (argc != 4) {
         argsErrorMessage();
         return 1;
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     clock_t startLZS;
     clock_t endLZS;
 
-    if (isInvalidArgoments(argc) || isInvalidFile(argv[2])) {
+    if (isInvalidArgs(argc) || isInvalidFile(argv[2])) {
         return 1;
     }
     if (strcmp(argv[1], "-c") == 0) {
