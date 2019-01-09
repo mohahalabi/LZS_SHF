@@ -407,7 +407,6 @@ unsigned char *writeDecompBuffer(Node *root, unsigned char *bufferIn, int buffer
                 root = actualRoot;
             }
         }
-
         indexBuffIn++;
         free(byte);
     }

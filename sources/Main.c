@@ -57,7 +57,6 @@ int main(int argc, char *argv[]) {
     clock_t startLZS;
     clock_t endLZS;
 
-
     if (isInvalidArgoments(argc) || isInvalidFile(argv[2])) {
         return 1;
     }
@@ -83,6 +82,7 @@ int main(int argc, char *argv[]) {
         executionTime(startLZS, endLZS, "LZS");
         executionTime(startSHF, endSHF, "SannonFano");
         executionTime(startLZS, endSHF, "LZS-SHF");
+
     } else if (strcmp(argv[1], "-d") == 0) {
 
         printf("Inizio decompressione shannonFano...\n");
