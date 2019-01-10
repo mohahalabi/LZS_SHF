@@ -38,7 +38,7 @@ int compareByFreqStabilized(const void *a, const void *b) {
         return 1;
     } else if (element1->frequency > element2->frequency) {
         return -1;
-    } else {  // if zero order by word
+    } else {  // if frequency1 = frequency2 order by word
         return element1->word - element2->word;
     }
 }
@@ -53,7 +53,7 @@ int compareByCodeLengthStabilized(const void *a, const void *b) {
         return -1;
     } else if (length1 > length2) {
         return 1;
-    } else {  // if zero order by word
+    } else {  // if length1 = length2 order by word
         return element1->word - element2->word;
     }
 }

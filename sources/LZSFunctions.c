@@ -52,14 +52,14 @@ int LZSCompression(int argc, char *nameInputFile) {
 }
 
 /**
- * Questa funzione serve per gestire i file di dimensione troppo piccola, i file di dimensione inferiore a 5 byte infatti non verranno compressi in quanto anche
- * comprimendoli il file compresso avrebbe una dimensione maggiore o uguale a quella del file in input.
+ * Questa funzione serve per gestire i file di dimensione piccola, i file di dimensione inferiore a MIN_SIZE_TO_COMPRESS bytes
+ * infatti non verranno compressi in quanto anche comprimendoli il file compresso avrebbe una dimensione maggiore o uguale a quella del file in input.
  *
  * @param fileSize: dimensione del file
  */
 int exceptionManegement(int fileSize) {
     if (fileSize <= MIN_SIZE_TO_COMPRESS) {
-        printf("File passato troppo piccolo per essere compresso\n");
+        printf("File passato vuoto o piccolo per essere compresso\n");
         return 1;
     } else {
         return 0;
