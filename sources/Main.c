@@ -15,11 +15,11 @@ Programming language: C standard version 99
 
 
 void argsErrorMessage() {
-    printf("Invalid argoments!\n");
-    printf("Compression's command:\n");
-    printf("executableFile -c fileToCompress compressedFileName\n\n");
-    printf("Decompression's command:\n");
-    printf("executableFile -d compressedFileName decompressedFileName \n");
+    printf("Gli argomenti non sono validi!\n");
+    printf("Commando di compressione:\n");
+    printf("./eseguibile -c file fileCompresso \n\n");
+    printf("Commando di decompressione:\n");
+    printf("./eseguibile -d fileCompresso fileDecompresso\n");
 }
 
 
@@ -35,7 +35,7 @@ int isInvalidArgs(int argc) {
 int isInvalidFile(char *inputFile) {
     FILE *file = fopen(inputFile, "r");
     if (!file) {
-        printf("The file does not exist!\n");
+        printf("Il file non esiste!\n");
         return 1;
     }
     fclose(file);
