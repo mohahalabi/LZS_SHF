@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
         unsigned char *buffer = getCodedBuffer();
         compressSHF(argv[3], buffer, bufferSize);
         endSHF = clock();
-        printf("Fine compressione shannonFano\n\n");
+        printf("Fine compressione ShannonFano\n\n");
 
         executionTime(startLZS, endLZS, "LZS");
         executionTime(startSHF, endSHF, "SannonFano");
@@ -85,11 +85,11 @@ int main(int argc, char *argv[]) {
 
     } else if (strcmp(argv[1], "-d") == 0) {
 
-        printf("Inizio decompressione shannonFano...\n");
+        printf("Inizio decompressione ShannonFano...\n");
         startSHF = clock();
         unsigned char *buffer = decompressSHF(argv[2]);
         endSHF = clock();
-        printf("Fine decompressione shannon\n\n");
+        printf("Fine decompressione ShannonFano\n\n");
         printf("Inizio decompressione LZS...\n");
         startLZS = clock();
         LZSDecompression(argc, buffer, argv[3]);

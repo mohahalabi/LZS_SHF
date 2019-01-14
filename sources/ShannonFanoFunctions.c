@@ -437,6 +437,8 @@ unsigned char *decompressSHF(char *compFileName) {
 
     free(buffer);
     free(root);
+    free(elements);
+
     return decompBuffer;
 }
 
