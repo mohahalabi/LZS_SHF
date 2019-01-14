@@ -11,6 +11,8 @@
 #include <time.h>
 #include <stdio.h>
 
+#define WINDOW_SIZE 2048
+#define MIN_SIZE_TO_COMPRESS 260
 
 typedef struct match {
     int length;
@@ -35,8 +37,6 @@ void writeByteToBuffer();
 
 void addBitToBuffer(unsigned char bit);
 
-//int checkFile(int argc, char *inputFile);
-
 unsigned int getFileSize(FILE *inputFile);
 
 void writeOffset(int offset);
@@ -53,9 +53,8 @@ void slidingWindowIntialization(SlidingWindow *slidingWindow);
 
 int searchMaxLength(int tail, unsigned char *buffer, int fileSize);
 
-int exceptionManegement(int fileSize);
 
-int LZSCompression(int argc, char *nameInputFile);
+void LZSCompression(FILE *inputFile, unsigned int fileSize);
 
 unsigned char *getCodedBuffer();
 

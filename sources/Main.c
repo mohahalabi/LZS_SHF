@@ -23,6 +23,21 @@ void argsErrorMessage() {
 }
 
 
+/**
+ * Questa funzione serve per gestire i file di dimensione piccola, i file di dimensione inferiore a MIN_SIZE_TO_COMPRESS bytes
+ * infatti non verranno compressi in quanto anche comprimendoli il file compresso avrebbe una dimensione maggiore o uguale a quella del file in input.
+ *
+ * @param fileSize: dimensione del file
+ */
+int exceptionManegement(unsigned int fileSize) {
+    if (fileSize <= MIN_SIZE_TO_COMPRESS) {
+        printf("File passato vuoto o piccolo per essere compresso\n");
+        return 1;
+    } else
+        return 0;
+}
+
+
 int isInvalidArgs(int argc) {
     if (argc != 4) {
         argsErrorMessage();
@@ -62,11 +77,14 @@ int main(int argc, char *argv[]) {
     }
     if (strcmp(argv[1], "-c") == 0) {
 
+        FILE *inputFile = fopen(argv[2], "rb");
+        unsigned int fileSize = getFileSize(inputFile);
+        if (exceptionManegement(fileSize)) {
+            return 1;
+        }
         printf("Inizio compressione LZS...\n");
         startLZS = clock();
-        int error = LZSCompression(argc, argv[2]);
-        if (error)
-            return 1;
+        LZSCompression(inputFile, fileSize);
         printf("Fine compressione LZS\n\n");
 
         endLZS = clock();

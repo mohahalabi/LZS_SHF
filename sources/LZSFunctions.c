@@ -3,8 +3,7 @@
 //
 #include "../headers/LZSFunctions.h"
 
-#define WINDOW_SIZE 2048
-#define MIN_SIZE_TO_COMPRESS 260
+
 /**
  * byte: E' l'appoggio che utilizzo per scrivere i singoli bit sul file, questo infatti viene riempito con otto bit e poi scritto.
  * currentBit: Variabile che indica quanti bit sono stati inseriti all'interno del byte.
@@ -29,42 +28,20 @@ int getCodedBufferSize() {
 /**
  * Funzione chiamata quando si passa il parametro "-c", fa partire la compressione del file gestendo eventuali eccezioni che potrebbero verificarsi.
  */
-int LZSCompression(int argc, char *nameInputFile) {
-/*
-    if (checkFile(argc, nameInputFile) == 1) {
-        return 1;
-    }
-*/
+void LZSCompression(FILE *inputFile, unsigned int fileSize) {
 
-    FILE *inputFile = fopen(nameInputFile, "rb");
-    int fileSize = getFileSize(inputFile);
-
-    if (exceptionManegement(fileSize) == 1) {
-        return 1;
-    }
     unsigned char *buffer = (unsigned char *) malloc((fileSize) * sizeof(unsigned char));
     codedBuffer = (unsigned char *) malloc(sizeof(unsigned char));
+
     fread(buffer, (size_t) fileSize, 1, inputFile);
 
     encoding(buffer, fileSize);
+
+    free(buffer);
+
     fclose(inputFile);
-    return 0;
 }
 
-/**
- * Questa funzione serve per gestire i file di dimensione piccola, i file di dimensione inferiore a MIN_SIZE_TO_COMPRESS bytes
- * infatti non verranno compressi in quanto anche comprimendoli il file compresso avrebbe una dimensione maggiore o uguale a quella del file in input.
- *
- * @param fileSize: dimensione del file
- */
-int exceptionManegement(int fileSize) {
-    if (fileSize <= MIN_SIZE_TO_COMPRESS) {
-        printf("File passato vuoto o piccolo per essere compresso\n");
-        return 1;
-    } else {
-        return 0;
-    }
-}
 
 /**
  * Questa funzione si occupa di scorrere il buffer per cercare pattern di caratteri che si ripetono, di aggiornare la finestra scorrevole e di scrivere l'end marker.
@@ -202,7 +179,6 @@ void writeEndMarker() {
     while (currentBit != 0) {
         addBitToBuffer(0);
     }
-    //printf("%d \n", codedBufferCounter);
 }
 
 /**
@@ -268,19 +244,6 @@ void writeOffset(int offset) {
     }
 }
 
-/*int checkFile(int argc, char *inputFile) {
-    if (argc != 4) {
-        printf("errore negli argomenti \n");
-        return 1;
-    }
-    FILE *controllo = fopen(inputFile, "r");
-    if (!controllo) {
-        //fclose(controllo);
-        printf("file passato inesistente \n");
-        return 1;
-    }
-    return 0;
-}*/
 
 /**
  * In base a quanto vale la lunghezza passata vengono scritti determinati bit (specificati nella tabella dello standard).
