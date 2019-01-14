@@ -7,8 +7,8 @@ Programming language: C standard version 99
 ****************************************************************************
 */
 
-#ifndef COMPRESSOR_COMPRESSION_H
-#define COMPRESSOR_COMPRESSION_H
+#ifndef LZS_SHF_SHANNONFANOFUNCTIONS_H
+#define LZS_SHF_SHANNONFANOFUNCTIONS_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,4 +102,4 @@ unsigned char *writeDecompBuffer(Node *root, unsigned char *bufferIn, int buffer
 unsigned char *decompressSHF(char *compFileName);
 
 
-#endif //COMPRESSOR_COMPRESSION_H
+#endif //LZS_SHF_SHANNONFANOFUNCTIONS_H

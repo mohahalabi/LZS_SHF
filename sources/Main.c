@@ -17,9 +17,9 @@ Programming language: C standard version 99
 void argsErrorMessage() {
     printf("Gli argomenti non sono validi!\n");
     printf("Commando di compressione:\n");
-    printf("./eseguibile -c file fileCompresso \n\n");
+    printf("./run -c file fileCompresso \n\n");
     printf("Commando di decompressione:\n");
-    printf("./eseguibile -d fileCompresso fileDecompresso\n");
+    printf("./run -d fileCompresso fileDecompresso\n");
 }
 
 
@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
         if (exceptionManegement(fileSize)) {
             return 1;
         }
+
         printf("Inizio compressione LZS...\n");
         startLZS = clock();
         LZSCompression(inputFile, fileSize);
