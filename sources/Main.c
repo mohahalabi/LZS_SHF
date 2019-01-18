@@ -24,9 +24,9 @@ void argsErrorMessage() {
 
 
 /**
- * Questa funzione serve per gestire i file di dimensione piccola, i file di dimensione inferiore a MIN_SIZE_TO_COMPRESS bytes
- * infatti non verranno compressi in quanto anche comprimendoli il file compresso avrebbe una dimensione maggiore o uguale a quella del file in input.
- *
+ * Questa funzione serve per gestire i file di dimensione piccola, i file di dimensione inferiore
+ * a MIN_SIZE_TO_COMPRESS bytes infatti non verranno compressi in quanto anche comprimendoli
+ * il file compresso avrebbe una dimensione maggiore o uguale a quella del file in input.
  * @param fileSize: dimensione del file
  */
 int exceptionManegement(unsigned int fileSize) {
