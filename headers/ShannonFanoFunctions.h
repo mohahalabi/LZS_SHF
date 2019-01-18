@@ -16,6 +16,8 @@ Programming language: C standard version 99
 #include <string.h>
 #include <time.h>
 
+// MAX_CODE: numero massimo di tutti gli elementi, in altre parole tutte
+// le combinazioni possibili di 2^8 = 256
 #define MAX_CODE 256
 
 

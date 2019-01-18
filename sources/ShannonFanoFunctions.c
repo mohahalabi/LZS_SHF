@@ -11,6 +11,7 @@ Programming language: C standard version 99
 
 /************************ Compression's Functions Definition *****************************/
 
+
 void initializeElements(Element *ptrElements) {
     for (int i = 0; i < MAX_CODE; ++i) {
         ptrElements[i].word = (unsigned char) i;
@@ -20,6 +21,14 @@ void initializeElements(Element *ptrElements) {
 }
 
 
+/**
+ * Description: calcola le frequenze di bytes presenti
+ *
+ * @param
+ * ptrElements: tabella di frequenze
+ * buffer: punta al primo elemento del buffer che contiene la codifica di LZS
+ * bufferSize: size di buffer
+ * */
 void calculateFrequencies(Element *ptrElements, unsigned char *buffer, int bufferSize) {
     unsigned char ch;
     int index = 0;
@@ -81,6 +90,14 @@ void orderByWord(Element *ptrElements) {
 }
 
 
+/**
+ * Description: funzione che restituisce la somma delle frequenze
+ *              presenti nel sotto albero del nodo passato, la funzione verrà
+ *              chiamata nella funzione getSplitIndex
+ * @param
+ * ptrElements: tabella di frequenze
+ * root: il nodo padre che si vuole sapere le somme di frequenze che copre
+ * */
 long long int sumFrequencies(Element *ptrElements, Node *root) {
     long long int sumOfFrequencies = 0;
     for (int i = root->start; i <= root->end; ++i) {
@@ -89,7 +106,19 @@ long long int sumFrequencies(Element *ptrElements, Node *root) {
     return sumOfFrequencies;
 }
 
-
+/**
+ * Description: funzione che restituisce l'indice in cui avviene la suddivisione
+ *              esempio : se abbiamo il seguente tabella
+ *              index   0 1 2 3 4 5
+ *              word    a b c d e f
+ *              freq    2 2 1 1 1 1
+ *              La funzione restituisce l'indice di suddivisione '1'
+ *              tale suddivisione produce due nodi figli;
+ *              sinistro:a b    e destro: c d e f
+ * @param
+ * ptrElements: tabella di frequenze
+ * root: il nodo padre che si vuole sapere le somme di frequenze che copre
+ * */
 int getSplitIndex(Element *ptrElements, Node *root) {
     long long int sumOfFrequencies = sumFrequencies(ptrElements, root);
     int splitIndex = 0;
@@ -108,7 +137,14 @@ int getSplitIndex(Element *ptrElements, Node *root) {
     return splitIndex;
 }
 
-
+/**
+ * Description: crea e restituisce un puntatore a un nuovo nodo
+ *
+ * @param
+ * lNode: puntatore al figlio sinistro
+ * rNode: puntatore al figlio destro
+ * start, end indicano i sotto nodi coperti dal nodo restituito
+ * */
 Node *createNode(Node *lNode, Node *rNode, int start, int end) {
     Node *newNode = malloc(sizeof(Node));
     newNode->leftChild = lNode;
@@ -118,7 +154,14 @@ Node *createNode(Node *lNode, Node *rNode, int start, int end) {
     return newNode;
 }
 
-
+/**
+ * Description: crea l'albero di codifica, questa funzione viene chiamata
+ *              in modo ricorsivo
+ *
+ * @param
+ * ptrElements : tabella degli elementi
+ * root: radice dell'albero
+ * */
 void createEncodingTree(Element *ptrElements, Node *root) {
     int splitIndex = getSplitIndex(ptrElements, root);
 
@@ -140,9 +183,17 @@ void createEncodingTree(Element *ptrElements, Node *root) {
     }
 }
 
-
+// variabile globale per imagazzinare le codifiche in modo temporaneo
 char charactersHolder[MAX_CODE] = "";
 
+/**
+ * Description: procedura per creare le codifiche partendo dal albero
+ *              creato in precedenza
+ *
+ * @param
+ * ptrCodes: puntatore alle codifiche temporanee
+ * root: radice dell'albero
+ * */
 void encode(Code *ptrCodes, Node *root) {
     if (root->leftChild != NULL) {
         strcat(charactersHolder, "0");
@@ -156,7 +207,16 @@ void encode(Code *ptrCodes, Node *root) {
     }
 }
 
-
+/**
+ * Description: procedura per copiare le codifiche degli dalla struttura temporanea
+ *              alla tabella degli elementi
+ *              questa operazione viene eseguita solo per gli elementi che hanno
+ *              una frequenza > 0, quindi presenti nel file di input
+ *
+ * @param
+ * ptrElements: tabella degli elementi
+ * ptrCodes: puntatore alle codifiche temporanee
+ * */
 void writeCodesForAllElements(Element *ptrElements, Code *ptrCodes) {
     for (int i = 0; i < MAX_CODE; ++i) {
         int targetIndex = ptrElements[i].word;
@@ -167,14 +227,29 @@ void writeCodesForAllElements(Element *ptrElements, Code *ptrCodes) {
     }
 }
 
-
+/**
+ * Description: funzione che restituisce un puntatore alla struttura CodeBits
+ *                 che verrà utilizzata per generare la codifica canonica
+ *
+ * @param
+ * ptrElements: tabella degli elementi
+ * ptrCodes: puntatore alle codifiche temporanee
+ * */
 CodeBits *getCodeBits() {
     CodeBits *codeBits = malloc(sizeof(CodeBits));
     codeBits->bits = 0;
     return codeBits;
 }
 
-
+/**
+ * Description: dato un numero a 64 bits, questa funzione converte i bits,
+ *              per una lunghezza data (la lunghezza della codifica) in
+ *              caratteri (zeri ed uni) e restituisce un puntatore a tali caratteri
+ *
+ * @param
+ * num: il numero da convertire
+ * length: la lunghezza della codifica
+ * */
 char *fromNumToChars(long long num, int length) {
     char *code = malloc(length * sizeof(char));
     strcpy(code, "");
@@ -185,34 +260,45 @@ char *fromNumToChars(long long num, int length) {
 }
 
 
+/**
+ * Description: Procedura che genera la codifica canonica di tutti gli elementi
+ *              presenti nei dati di input (il file o il buffer di LZS)
+ *              le codifiche precedenti generati con l'albero di shannon fano vengono
+ *              sostituiti con la codifica canonica.
+ *              Gli elementi vengono passati ordinati per lunghezze crescenti.
+ *              Questa procedura va sfruttata sia in compressione che in decompressione
+ *
+ * @param
+ * ptrElements: tabella degli elementi
+ * */
 void canonizeCodes(Element *ptrElements) {
 
     CodeBits *codeBits = getCodeBits();
-    int firstLength = ptrElements[0].codeLength;
+    int firstLength = ptrElements[0].codeLength;   // è la lunghezza minore
     for (int i = 0; i < firstLength; ++i) {
-        ptrElements[0].code[i] = '0';
+        ptrElements[0].code[i] = '0';   // riempire con zeri
     }
     int currentLength = 0;
     for (int i = 1; i < MAX_CODE; ++i) {
-        currentLength = ptrElements[i].codeLength;
-        if (currentLength == firstLength) {
+        currentLength = ptrElements[i].codeLength; // la lunghezza di codifica subito dopo
+        if (currentLength == firstLength) { // se sono uguali, sommare uno
             codeBits->bits++;
             strcpy(ptrElements[i].code, fromNumToChars(codeBits->bits, currentLength));
-        } else if (currentLength > firstLength) {
-            codeBits->bits++;
+        } else if (currentLength > firstLength) {   // altrimenti sommare uno e shiftare a sinistra
+            codeBits->bits++;                       // quanto la differenza tra le due lunghezze
             for (int j = 0; j < (currentLength - firstLength); ++j) {
                 codeBits->bits = codeBits->bits << 1;
             }
             strcpy(ptrElements[i].code, fromNumToChars(codeBits->bits, currentLength));
         }
-        firstLength = currentLength;
+        firstLength = currentLength;    // aggiornare le lunghezze
     }
 }
 
 
-long bitsNumber = 0;    // All the bits written on the compressed file
-unsigned char byte = 0; // Single byte to write on the compressed file
-int currentBit = 0;     // The current bit to add, when its value is 8, I reset it to 0
+long bitsNumber = 0; // Tutti i bits scritti sul file compresso
+unsigned char byte = 0;
+int currentBit = 0; // il numero di bit currente da scrivere, quando è uguale a 8, lo rimetto a 0
 
 void addBitToFile(unsigned char bit, FILE *file) {
     currentBit++;
@@ -229,6 +315,14 @@ void writeByte(FILE *file) {
 }
 
 
+/**
+ * Description: procedura per scrivere il blocco di 256 lunghezze
+ *              sul file compresso
+ *
+ * @param
+ * outputFile : puntatore al file di output (file compresso)
+ * ptrElements: tabella degli elementi
+ * */
 void writeLengths(FILE *outputFile, Element *ptrElements) {
     unsigned char lengths[MAX_CODE];
     for (int i = 0; i < MAX_CODE; ++i) {
@@ -239,11 +333,19 @@ void writeLengths(FILE *outputFile, Element *ptrElements) {
     bitsNumber += (MAX_CODE * 8);
 }
 
-
+/**
+ * Description: scrittura finale del file compresso
+ *
+ * @param
+ * buffer: puntatore al buffer di passato da LZS
+ * bufferSize: size del buffer
+ * outputFile : puntatore al file di output (file compresso)
+ * ptrElements: tabella degli elementi
+ * */
 void writeCompressedFile(unsigned char *buffer, int bufferSize, FILE *outputFile, Element *ptrElements) {
 
     fseek(outputFile, 1, SEEK_SET); // lascio spazio per il byte di flag!
-    writeLengths(outputFile, ptrElements);
+    writeLengths(outputFile, ptrElements);  // scrivo le lunghezze
 
     fseek(outputFile, MAX_CODE + 1, SEEK_SET);
 
@@ -258,9 +360,9 @@ void writeCompressedFile(unsigned char *buffer, int bufferSize, FILE *outputFile
         bitsNumber += ptrElements[ch].codeLength;
         index++;
     }
-    int lastBitsToWrite = 8 - (bitsNumber % 8);
-    // completare l'ultimo byte con zeri
-    for (int i = 0; i < lastBitsToWrite; ++i) {
+    int lastBitsToWrite = 8 - (bitsNumber % 8); // scrittura degli ultimi bits
+
+    for (int i = 0; i < lastBitsToWrite; ++i) { // completare l'ultimo byte con zeri
         addBitToFile(0, outputFile);
         bitsNumber++;
     }
@@ -272,14 +374,30 @@ void writeCompressedFile(unsigned char *buffer, int bufferSize, FILE *outputFile
 }
 
 
+/**
+ * Description: La procedura principale tramite la quale vengono chiamate
+ *              e gestite tutte le funzione/procedure legate alla compressione.
+ *              Si occupa anche della allocazione della memoria necessaria per
+ *              il processo di compressione
+ *
+ * @param
+ * buffer: puntatore al buffer di passato da LZS
+ * bufferSize: size del buffer
+ * outputFile : puntatore al file di output (file compresso)
+ * ptrElements: tabella degli elementi
+ * */
 void compressSHF(char *toCompFileName, unsigned char *codedBuffer, int codedBufferCounter) {
+
     Element *elements = malloc(MAX_CODE * sizeof(Element));
     Code *codes = malloc(MAX_CODE * sizeof(Code));
+
     initializeElements(elements);
     calculateFrequencies(elements, codedBuffer, codedBufferCounter);
+
     orderByFreqDesc(elements);
     Node *root = createNode(NULL, NULL, 0, MAX_CODE - 1);
     createEncodingTree(elements, root);
+
     encode(codes, root);
     writeCodesForAllElements(elements, codes);
 
@@ -291,6 +409,7 @@ void compressSHF(char *toCompFileName, unsigned char *codedBuffer, int codedBuff
 
     orderByWord(elements);
     FILE *compressed = fopen(toCompFileName, "wb");
+
     writeCompressedFile(codedBuffer, codedBufferCounter, compressed, elements);
     free(codedBuffer);
 }
@@ -304,9 +423,10 @@ int lastBits = 0;
 void readHeader(FILE *inputFile, Element *ptrElements) {
     unsigned char lengths[MAX_CODE];
     fseek(inputFile, 0, SEEK_SET);
-    fread(&lastBits, sizeof(unsigned char), 1, inputFile);
-    fread(lengths, sizeof(unsigned char), MAX_CODE, inputFile);
+    fread(&lastBits, sizeof(unsigned char), 1, inputFile); // leggere il byte di flag
+    fread(lengths, sizeof(unsigned char), MAX_CODE, inputFile); // leggere le lunghezze
 
+    // per ogni elemento, assegnare la respettiva lunghezza
     for (int i = 0; i < MAX_CODE; ++i) {
         ptrElements[i].word = (unsigned char) i;
         ptrElements[i].codeLength = lengths[i];
@@ -314,25 +434,42 @@ void readHeader(FILE *inputFile, Element *ptrElements) {
 }
 
 
+/**
+ * Description: leggere il file compresso e metterlo in memoria
+ *
+ * @param
+ * inputFile: puntatore al file compresso
+ * buffer: puntatore ai dati letti dal file
+ * bufferSize: dimensione del buffer, è uguale alla dimensione del file
+ * */
 void readCompressedFile(FILE *inputFile, unsigned int bufferSize, unsigned char *buffer) {
     fseek(inputFile, MAX_CODE + 1, SEEK_SET);
     fread(buffer, sizeof(unsigned char), bufferSize, inputFile);
 }
 
 
+/**
+ * Description: procedura ricorsiva per creare l'albero di decodifica
+ *
+ * @param
+ * root: nodo radice, cambia con ogni chiamata ricorsiva
+ * code: la codofica
+ * index: indice di scorrimento della codifica
+ * word: il valore da assegnare al giusto nodo
+ * */
 void createDecodingTree(Node *root, const char *code, int index, unsigned char word) {
-    if (code[index] != '\0') {
-        if (code[index] == '0') {
-            if (root->leftChild == NULL) {
-                Node *lNode = createNode(NULL, NULL, -1, -1);
-                root->leftChild = lNode;
+    if (code[index] != '\0') { // se la codifica contiene ancora dei bits
+        if (code[index] == '0') {   // se il bit è un '0'
+            if (root->leftChild == NULL) { // ed il figlio sinistro == NULL
+                Node *lNode = createNode(NULL, NULL, -1, -1);  // creare un nuovo nodo
+                root->leftChild = lNode;   // assegnare il nuovo nodo al figlio sinistro
+                index++;    // incrementa l'indice di bit
+                createDecodingTree(root->leftChild, code, index, word); // fare la stessa cosa con il prossimo bit
+            } else {  // se il figlio sinistro non è NULL
                 index++;
-                createDecodingTree(root->leftChild, code, index, word);
-            } else {
-                index++;
-                createDecodingTree(root->leftChild, code, index, word);
+                createDecodingTree(root->leftChild, code, index, word); // scendi nel figlio sinistro
             }
-        } else {
+        } else { // altrimenti il bit è un '1'
             if (root->rightChild == NULL) {
                 Node *rNode = createNode(NULL, NULL, -1, -1);
                 root->rightChild = rNode;
@@ -343,7 +480,7 @@ void createDecodingTree(Node *root, const char *code, int index, unsigned char w
                 createDecodingTree(root->rightChild, code, index, word);
             }
         }
-    } else {
+    } else {  // quando sono esauriti i bits della codifica, assegnare il valore della codifica al nodo
         root->start = word;
         root->end = word;
         return;
@@ -351,6 +488,15 @@ void createDecodingTree(Node *root, const char *code, int index, unsigned char w
 }
 
 
+/**
+ * Description: Procedura chiamante di createDecodingTree.
+ *              Passa le codifiche di tutti gli elementi alla procedura createDecodingTree
+ *              per inizializzare i nodi nelle posizione giuste.
+ *
+ * @param
+ * root: nodo radice
+ * ptrElements: tabella degli elementi
+ * */
 void decode(Node *root, Element *ptrElements) {
     for (int i = 0; i < MAX_CODE; ++i) {
         if (ptrElements[i].codeLength != 0) {
@@ -366,6 +512,12 @@ int extractBitOnPosition(unsigned char byte, int bitPosition) {
 }
 
 
+/**
+ * Description: Dato un byte, lo restituisce in forma di caratteri zeri ed uni
+ *
+ * @param
+ * byte: il byte da convertire in caratteri
+ * */
 char *byteToChars(unsigned char byte) {
     char *chars = malloc(8 * sizeof(char));
     for (int i = 1; i <= 8; ++i) {
@@ -375,34 +527,46 @@ char *byteToChars(unsigned char byte) {
 }
 
 
+/**
+ * Description: Questa funzione ha il compito di attraversare l'albero di decodifica
+ *              per identificare la codifica originale per ogni byte.
+ *              La funzione restituisce alla fine un puntatore ai dati che saranno decompressi
+ *              dall'algoritmo LZS.
+ *
+ * @param
+ * root: radice dell'albero di decodifica
+ * bufferIn: puntatore ai dati compressi
+ * bufferSize: size di bufferIn
+ * */
 unsigned char *writeDecompBuffer(Node *root, unsigned char *bufferIn, int bufferSize) {
 
-    Node *actualRoot = root;
-    unsigned int initialBuffSize = 512;
+    Node *actualRoot = root;  // radice effettivo
+    unsigned int initialBuffSize = 512; // 512 bytes: dimensione iniziale del buffer
     unsigned char *bufferOut = malloc(initialBuffSize * sizeof(unsigned char));
 
-    unsigned int indexBuffIn = 0;
-    unsigned int indexBuffOut = 0;
+    unsigned int indexBuffIn = 0;   // indice di scorrimento del buffer in entrata
+    unsigned int indexBuffOut = 0;  // indice di scorrimento del buffer in uscita
 
     while (indexBuffIn < bufferSize) {
         char *byte = byteToChars(bufferIn[indexBuffIn]);
         for (int i = 0; i < 8; ++i) {
-            // trascurare gli ultimi bit che non fanno parte del file originale
-            if (indexBuffIn == bufferSize - 1 && i == (8 - lastBits)) {
-                break;
-            }
 
+            if (indexBuffIn == bufferSize - 1 && i == (8 - lastBits)) { // siamo arrivati all'ultimo byte?
+                break; // allora trascurare gli ultimi bit che non fanno parte del file originale
+            }
             if (byte[i] == '0')
                 root = root->leftChild;
             else
                 root = root->rightChild;
 
-            if (root->leftChild == NULL) {
-                if (indexBuffOut == initialBuffSize - 1) {
+            if (root->leftChild == NULL) { // sono in una foglia
+                if (indexBuffOut == initialBuffSize - 1) { // controllo se lo spazio allocato è esaurito
+                    // raddoppio la dimensione di spazio iniziale
                     initialBuffSize <<= 1;
+                    // realloco la memoria estesa
                     bufferOut = realloc(bufferOut, initialBuffSize * sizeof(unsigned char));
                 }
-                bufferOut[indexBuffOut] = (unsigned char) root->start;
+                bufferOut[indexBuffOut] = (unsigned char) root->start; // scrivo il byte originale
                 indexBuffOut++;
                 root = actualRoot;
             }
@@ -410,10 +574,19 @@ unsigned char *writeDecompBuffer(Node *root, unsigned char *bufferIn, int buffer
         indexBuffIn++;
         free(byte);
     }
-    return bufferOut;
+    return bufferOut; // restituisco il puntatore a LZS
 }
 
 
+/**
+ * Description: La procedura principale tramite la quale vengono chiamate
+ *              e gestite tutte le funzione/procedure legate alla decompressione.
+ *              Si occupa anche della allocazione della memoria necessaria per
+ *              il processo di deccompressione
+ *
+ * @param
+ * compFileName: il nome del file compresso passato dall'utente
+ * */
 unsigned char *decompressSHF(char *compFileName) {
 
     Element *elements = malloc(MAX_CODE * sizeof(Element));
@@ -441,4 +614,3 @@ unsigned char *decompressSHF(char *compFileName) {
 
     return decompBuffer;
 }
-
