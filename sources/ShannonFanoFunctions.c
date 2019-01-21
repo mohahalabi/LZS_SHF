@@ -26,7 +26,7 @@ void initializeElements(Element *ptrElements) {
  *
  * @param
  * ptrElements: tabella di frequenze
- * buffer: punta al primo elemento del buffer che contiene la codifica di LZS
+ * buffer: puntatore al buffer che contiene la codifica di LZS
  * bufferSize: size di buffer
  * */
 void calculateFrequencies(Element *ptrElements, unsigned char *buffer, int bufferSize) {
@@ -95,8 +95,8 @@ void orderByWord(Element *ptrElements) {
  *              presenti nel sotto albero del nodo passato, la funzione verrà
  *              chiamata nella funzione getSplitIndex
  * @param
- * ptrElements: tabella di frequenze
- * root: il nodo padre che si vuole sapere le somme di frequenze che copre
+ * ptrElements: tabella di elementi
+ * root: il nodo padre di cui si vuole sapere le somma di frequenze che copre
  * */
 long long int sumFrequencies(Element *ptrElements, Node *root) {
     long long int sumOfFrequencies = 0;
@@ -116,8 +116,8 @@ long long int sumFrequencies(Element *ptrElements, Node *root) {
  *              tale suddivisione produce due nodi figli;
  *              sinistro:a b    e destro: c d e f
  * @param
- * ptrElements: tabella di frequenze
- * root: il nodo padre che si vuole sapere le somme di frequenze che copre
+ * ptrElements: tabella di elementi
+ * root: il nodo padre di cui si vuole sapere le somme di frequenze che copre
  * */
 int getSplitIndex(Element *ptrElements, Node *root) {
     long long int sumOfFrequencies = sumFrequencies(ptrElements, root);
@@ -183,7 +183,7 @@ void createEncodingTree(Element *ptrElements, Node *root) {
     }
 }
 
-// variabile globale per imagazzinare le codifiche in modo temporaneo
+// variabile globale per immagazzinare le codifiche in modo temporaneo
 char charactersHolder[MAX_CODE] = "";
 
 /**
@@ -208,7 +208,7 @@ void encode(Code *ptrCodes, Node *root) {
 }
 
 /**
- * Description: procedura per copiare le codifiche degli dalla struttura temporanea
+ * Description: procedura per copiare le codifiche dalla struttura temporanea
  *              alla tabella degli elementi
  *              questa operazione viene eseguita solo per gli elementi che hanno
  *              una frequenza > 0, quindi presenti nel file di input
@@ -232,8 +232,7 @@ void writeCodesForAllElements(Element *ptrElements, Code *ptrCodes) {
  *                 che verrà utilizzata per generare la codifica canonica
  *
  * @param
- * ptrElements: tabella degli elementi
- * ptrCodes: puntatore alle codifiche temporanee
+ * 
  * */
 CodeBits *getCodeBits() {
     CodeBits *codeBits = malloc(sizeof(CodeBits));
@@ -337,7 +336,7 @@ void writeLengths(FILE *outputFile, Element *ptrElements) {
  * Description: scrittura finale del file compresso
  *
  * @param
- * buffer: puntatore al buffer di passato da LZS
+ * buffer: puntatore al buffer passato da LZS
  * bufferSize: size del buffer
  * outputFile : puntatore al file di output (file compresso)
  * ptrElements: tabella degli elementi
@@ -381,10 +380,9 @@ void writeCompressedFile(unsigned char *buffer, int bufferSize, FILE *outputFile
  *              il processo di compressione
  *
  * @param
- * buffer: puntatore al buffer di passato da LZS
+ * buffer: puntatore al buffer passato da LZS
  * bufferSize: size del buffer
  * outputFile : puntatore al file di output (file compresso)
- * ptrElements: tabella degli elementi
  * */
 void compressSHF(char *toCompFileName, unsigned char *codedBuffer, int codedBufferCounter) {
 
@@ -435,7 +433,7 @@ void readHeader(FILE *inputFile, Element *ptrElements) {
 
 
 /**
- * Description: leggere il file compresso e metterlo in memoria
+ * Description: leggere il file compresso e copiarlo in memoria
  *
  * @param
  * inputFile: puntatore al file compresso
@@ -491,7 +489,7 @@ void createDecodingTree(Node *root, const char *code, int index, unsigned char w
 /**
  * Description: Procedura chiamante di createDecodingTree.
  *              Passa le codifiche di tutti gli elementi alla procedura createDecodingTree
- *              per inizializzare i nodi nelle posizione giuste.
+ *              per inizializzare i nodi nelle posizioni giuste.
  *
  * @param
  * root: nodo radice
